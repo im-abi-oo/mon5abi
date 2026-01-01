@@ -1,0 +1,37 @@
+name: Setup Node.js Project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  setup-node:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Initialize package.json if missing
+        run: |
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+
+      - name: Install dependencies
+        run: |
+          npm install express mongoose socket.io node-telegram-bot-api cors dotenv
+
+      - name: Commit package files
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add package.json package-lock.json
+          git commit -m "Add package.json and dependencies" || echo "No changes to commit"
+          git push
